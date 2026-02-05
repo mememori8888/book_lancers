@@ -18,11 +18,14 @@
                 <h2><span class="icon">🔍</span> 書籍検索</h2>
                 <form id="order-form">
                     <div class="form-group">
-                        <label for="isbn">ISBNコード (13桁)</label>
-                        <input type="text" id="isbn" name="isbn" placeholder="例: 9784003220818" required>
+                        <label for="isbn-list">ISBNコード (改行で複数入力可)</label>
+                        <textarea id="isbn-list" name="isbn-list" rows="5" placeholder="例:
+9784003220818
+9784101010016
+9784798157578"></textarea>
                     </div>
                     <button type="submit" id="submit-btn">
-                        <span class="button-text">検索実行</span>
+                        <span class="button-text">一括検索実行</span>
                         <span class="spinner" style="display: none;"></span>
                     </button>
                 </form>
