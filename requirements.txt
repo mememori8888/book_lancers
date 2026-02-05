@@ -2,3 +2,4 @@ selenium-wire
 beautifulsoup4
 pandas
 lxml
+blinker==1.4
