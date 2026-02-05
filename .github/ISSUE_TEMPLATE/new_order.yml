@@ -1,0 +1,48 @@
+name: 📚 New Book Order
+description: Register a new book order for processing.
+title: "New Order: [Book Title]"
+labels: ["order", "new"]
+body:
+  - type: input
+    id: book_title
+    attributes:
+      label: Book Title
+      description: "The title of the book being ordered."
+      placeholder: "e.g., The Hitchhiker's Guide to the Galaxy"
+    validations:
+      required: true
+  - type: input
+    id: product_code
+    attributes:
+      label: Product Code (JAN/ISBN)
+      description: "13 or 5 digit product code from the order email."
+      placeholder: "e.g., 9784336065704"
+    validations:
+      required: true
+  - type: input
+    id: price
+    attributes:
+      label: Price (including tax)
+      description: "The price of the book as listed in the order email."
+      placeholder: "e.g., 4186"
+    validations:
+      required: true
+  - type: input
+    id: customer_email
+    attributes:
+      label: Customer Email
+      description: "The email address of the customer who placed the order."
+      placeholder: "e.g., customer@example.com"
+    validations:
+      required: true
+  - type: dropdown
+    id: source_store
+    attributes:
+      label: Order Source
+      description: "Where did this order come from?"
+      options:
+        - "Amazon"
+        - "Rakuten"
+        - "Other"
+    validations:
+      required: true
