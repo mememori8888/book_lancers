@@ -119,21 +119,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
         data.forEach(item => {
             const row = document.createElement('tr');
-            
-            const overallStatus = item.results.every(r => r.status === 'OK') 
-                ? '<span class="status-badge status-ok">成功</span>'
-                : (item.results.some(r => r.status === 'OK') 
-                    ? '<span class="status-badge status-partial">一部成功</span>' 
-                    : '<span class="status-badge status-ng">失敗</span>');
+            row.dataset.isbn = item.isbn; // Store isbn for modal lookup
+            row.dataset.timestamp = item.timestamp; // Store timestamp for modal lookup
+
+            const overallStatus = item.results.some(r => r.status === 'OK')
+                ? '<span class="status-badge status-ok">在庫あり</span>'
+                : '<span class="status-badge status-ng">在庫なし/エラー</span>';
 
             row.innerHTML = `
                 <td>${item.timestamp}</td>
                 <td>${item.isbn}</td>
                 <td>${item.title}</td>
                 <td>${overallStatus}</td>
-                <td><button class="action-btn">再検索</button></td>
+                <td>
+                    <button class="action-btn view-details-btn">詳細</button>
+                    <button class="action-btn">再検索</button>
+                </td>
             `;
             tbody.appendChild(row);
         });
+
+        // Add event listeners for the new "Details" buttons
+        document.querySelectorAll('.view-details-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tr = e.target.closest('tr');
+                const isbn = tr.dataset.isbn;
+                const timestamp = tr.dataset.timestamp;
+                const dataItem = dummyData.find(d => d.isbn === isbn && d.timestamp === timestamp);
+                if (dataItem) {
+                    openDetailsModal(dataItem);
+                }
+            });
+        });
+    }
+
+    function openDetailsModal(dataItem) {
+        const modal = document.getElementById('details-modal');
+        modal.innerHTML = `
+            <h3>${dataItem.title}</h3>
+            <p>ISBN: ${dataItem.isbn}</p>
+            <p>検索日時: ${dataItem.timestamp}</p>
+            <p>結果:</p>
+            <ul>
+                ${dataItem.results.map(result => `
+                    <li>${result.site}: ${result.status}</li>
+                `).join('')}
+            </ul>
+        `;
+        modal.style.display = 'block';
     }
 });
