@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>書籍自動発注システム</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>書籍自動発注システム</h1>
+        <p>ISBNコードを入力して、各ECサイトの価格と在庫を一度に検索します。</p>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="search-form">
+                <h2><span class="icon">🔍</span> 書籍検索</h2>
+                <form id="order-form">
+                    <div class="form-group">
+                        <label for="isbn">ISBNコード (13桁)</label>
+                        <input type="text" id="isbn" name="isbn" placeholder="例: 9784003220818" required>
+                    </div>
+                    <button type="submit" id="submit-btn">
+                        <span class="button-text">検索実行</span>
+                        <span class="spinner" style="display: none;"></span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="results-area">
+                <h2><span class="icon">📊</span> 検索結果</h2>
+                <div id="results-container">
+                    <p class="no-results">まだ検索は実行されていません。</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Book Lancers. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

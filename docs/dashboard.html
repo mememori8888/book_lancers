@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コントロールパネル - 書籍自動発注システム</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>書籍自動発注システム</h1>
+        <nav>
+            <a href="index.html">書籍検索</a>
+            <a href="dashboard.html" class="active">コントロールパネル</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="dashboard-grid">
+                <!-- Summary Cards -->
+                <div class="card summary-card" id="total-searches">
+                    <h3>総検索数</h3>
+                    <p class="summary-value">0</p>
+                </div>
+                <div class="card summary-card" id="success-rate">
+                    <h3>成功率</h3>
+                    <p class="summary-value">0%</p>
+                </div>
+                <div class="card summary-card" id="error-count">
+                    <h3>要確認エラー</h3>
+                    <p class="summary-value">0</p>
+                </div>
+
+                <!-- Site Status Chart -->
+                <div class="card chart-card">
+                    <h2><span class="icon">📈</span> サイト別 成功率</h2>
+                    <canvas id="siteStatusChart"></canvas>
+                </div>
+
+                <!-- Search Settings -->
+                <div class="card settings-card">
+                    <h2><span class="icon">⚙️</span> 検索設定</h2>
+                    <p>検索対象にするECサイトを選択します。</p>
+                    <div id="site-settings" class="settings-grid">
+                        <!-- Checkboxes will be inserted by JS -->
+                    </div>
+                </div>
+
+                <!-- Search History -->
+                <div class="card history-card">
+                    <h2><span class="icon">📚</span> 検索履歴</h2>
+                    <div class="history-controls">
+                        <input type="text" id="history-search" placeholder="ISBNや書籍名で検索...">
+                        <button id="export-csv">CSVエクスポート</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="history-table">
+                            <thead>
+                                <tr>
+                                    <th>検索日時 <span class="sort-arrow"></span></th>
+                                    <th>ISBN <span class="sort-arrow"></span></th>
+                                    <th>書籍名 <span class="sort-arrow"></span></th>
+                                    <th>ステータス</th>
+                                    <th>アクション</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- History rows will be inserted by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Book Lancers. All rights reserved.</p>
+    </footer>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
