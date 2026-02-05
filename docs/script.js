@@ -1,229 +1,283 @@
-// script.js
+// dashboard.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('order-form');
-    const submitBtn = document.getElementById('submit-btn');
-    const spinner = document.querySelector('.spinner');
-    const buttonText = document.querySelector('.button-text');
-    const resultsContainer = document.getElementById('results-container');
-    const isbnTextarea = document.getElementById('isbn-list');
-    const checkLocalInventoryCheckbox = document.getElementById('check-local-inventory');
+    // --- REALISTIC DUMMY DATA ---
+    const dummyHistory = [
+        { 
+            timestamp: '2026-02-05 10:30', 
+            isbn: '9784297137819', 
+            title: 'スッキリわかるSQL入門 第3版', 
+            image: 'https://placehold.jp/150x200.png?text=SQL入門',
+            results: [ 
+                { site: 'honto', status: 'OK', price: 3080, message: '在庫あり' }, 
+                { site: 'rakuten', status: 'OK', price: 3080, message: '在庫あり' }, 
+                { site: 'yodobashi', status: 'OK', price: 3080, message: '在庫あり' },
+                { site: '7net', status: 'OK', price: 3080, message: 'お取り寄せ(1～3日)' },
+                { site: 'kinokuniya', status: 'NG', price: null, message: '在庫僅少' }
+            ] 
+        },
+        { 
+            timestamp: '2026-02-05 09:15', 
+            isbn: '9784297128138', 
+            title: '徹底攻略 情報処理安全確保支援士教科書', 
+            image: 'https://placehold.jp/150x200.png?text=支援士教科書',
+            results: [ 
+                { site: 'honto', status: 'OK', price: 3520, message: '在庫あり' }, 
+                { site: 'rakuten', status: 'NG', price: null, message: 'メーカー取り寄せ' }, 
+                { site: 'yodobashi', status: 'OK', price: 3520, message: '在庫あり' },
+                { site: '7net', status: 'NG', price: null, message: '在庫なし' },
+                { site: 'kinokuniya', status: 'OK', price: 3520, message: '店舗在庫あり' }
+            ] 
+        },
+        { 
+            timestamp: '2026-02-04 18:00', 
+            isbn: '9784839979359', 
+            title: 'Web API: The Good Parts', 
+            image: 'https://placehold.jp/150x200.png?text=Web+API',
+            results: [ 
+                { site: 'honto', status: 'OK', price: 2640, message: '在庫あり' }, 
+                { site: 'rakuten', status: 'OK', price: 2640, message: '在庫あり' }, 
+                { site: 'yodobashi', status: 'NG', price: null, message: '販売終了' },
+                { site: '7net', status: 'OK', price: 2640, message: '在庫あり' },
+                { site: 'kinokuniya', status: 'NG', price: null, message: '出版社在庫切れ' }
+            ] 
+        },
+        { 
+            timestamp: '2026-02-04 15:20', 
+            isbn: '9784774193248', 
+            title: 'パーフェクトPHP', 
+            image: 'https://placehold.jp/150x200.png?text=PHP',
+            results: [ 
+                { site: 'honto', status: 'LOCAL', price: null, message: '自家在庫にありました' }
+            ] 
+        },
+        { 
+            timestamp: '2026-02-03 11:45', 
+            isbn: '9999999999999', 
+            title: '存在しない書籍', 
+            image: 'https://placehold.jp/150x200.png?text=Not+Found',
+            results: [ 
+                { site: 'honto', status: 'NG', price: null, message: '商品が見つかりません' },
+                { site: 'rakuten', status: 'NG', price: null, message: '商品が見つかりません' },
+                { site: 'yodobashi', status: 'NG', price: null, message: '商品が見つかりません' },
+                { site: '7net', status: 'NG', price: null, message: '商品が見つかりません' },
+                { site: 'kinokuniya', status: 'NG', price: null, message: '商品が見つかりません' }
+            ] 
+        },
+    ];
 
-    // --- Start of Realistic Dummy Data ---
-    const dummyBookData = {
-        "9784297137819": {
-            title: "スッキリわかるSQL入門 第3版",
-            author: "中山 清喬, 飯田 理恵",
-            publisher: "翔泳社",
-            sites: {
-                honto: { success: true, message: "在庫あり", price: 3080 },
-                rakuten: { success: true, message: "在庫あり", price: 3080 },
-                yodobashi: { success: true, message: "在庫あり", price: 3080 },
-                '7net': { success: true, message: "お取り寄せ(1～3日)", price: 3080 },
-                kinokuniya: { success: false, message: "在庫僅少", price: null },
-            }
-        },
-        "9784297128138": {
-            title: "徹底攻略 情報処理安全確保支援士教科書 令和5年度",
-            author: "瀬戸 美月",
-            publisher: "インプレス",
-            sites: {
-                honto: { success: true, message: "在庫あり", price: 3520 },
-                rakuten: { success: false, message: "メーカー取り寄せ", price: null },
-                yodobashi: { success: true, message: "在庫あり", price: 3520 },
-                '7net': { success: false, message: "在庫なし", price: null },
-                kinokuniya: { success: true, message: "店舗在庫あり", price: 3520 },
-            }
-        },
-        "9784839979359": {
-            title: "Web API: The Good Parts",
-            author: "水野 貴明",
-            publisher: "マイナビ出版",
-            sites: {
-                honto: { success: true, message: "在庫あり", price: 2640 },
-                rakuten: { success: true, message: "在庫あり", price: 2640 },
-                yodobashi: { success: false, message: "販売終了", price: null },
-                '7net': { success: true, message: "在庫あり", price: 2640 },
-                kinokuniya: { success: false, message: "出版社在庫切れ", price: null },
-            }
-        },
-        "9784774193248": { // This ISBN will be used for the "local inventory" demo
-            title: "パーフェクトPHP (PERFECT SERIES)",
-            author: "小川 雄大",
-            publisher: "技術評論社",
-            sites: {
-                honto: { success: true, message: "在庫あり", price: 3520 },
-                rakuten: { success: true, message: "在庫あり", price: 3520 },
-                yodobashi: { success: true, message: "在庫あり", price: 3520 },
-                '7net': { success: true, message: "お取り寄せ(1～3日)", price: 3520 },
-                kinokuniya: { success: true, message: "店舗在庫あり", price: 3520 },
-            }
-        },
-        "9999999999999": { // Dummy for "not found" cases
-            title: "存在しない書籍",
-            author: "不明",
-            publisher: "不明",
-            sites: {
-                honto: { success: false, message: "商品が見つかりません", price: null },
-                rakuten: { success: false, message: "商品が見つかりません", price: null },
-                yodobashi: { success: false, message: "商品が見つかりません", price: null },
-                '7net': { success: false, message: "商品が見つかりません", price: null },
-                kinokuniya: { success: false, message: "商品が見つかりません", price: null },
-            }
-        }
+    const dummyPendingOrders = {
+        'honto': { current: 8500, target: 10000 },
+        'rakuten': { current: 2500, target: 5000 },
+        'yodobashi': { current: 12000, target: 10000 },
+        '7net': { current: 0, target: 3000 },
     };
-    const localInventoryIsbn = "9784774193248";
-    // --- End of Realistic Dummy Data ---
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    const dummySettings = {
+        'honto': { minOrder: 10000, keywords: '在庫あり, お取り寄せ' },
+        'rakuten': { minOrder: 5000, keywords: '在庫あり, 1-2日以内に発送' },
+        'yodobashi': { minOrder: 10000, keywords: '在庫あり' },
+        '7net': { minOrder: 3000, keywords: '在庫あり, お取り寄せ' },
+        'kinokuniya': { minOrder: 15000, keywords: '在庫あり, 店舗在庫あり' },
+    };
+    // --- END OF DUMMY DATA ---
 
-        const isbnList = isbnTextarea.value.trim().split('\n').filter(isbn => isbn.trim() !== '');
-        
-        if (isbnList.length === 0) {
-            alert('有効なISBNコードを1つ以上入力してください。');
-            return;
-        }
+    // --- INITIALIZE ---
+    updateSummaryCards(dummyHistory, dummyPendingOrders);
+    renderPendingOrders(dummyPendingOrders);
+    renderAdvancedSettings(dummySettings);
+    renderHistoryTable(dummyHistory);
+    setupModal();
 
-        const invalidIsbns = isbnList.filter(isbn => !/^\d{13}$/.test(isbn.trim()));
-        if (invalidIsbns.length > 0) {
-            alert(`以下のISBNコードの形式が正しくありません (13桁の数字):\n${invalidIsbns.join('\n')}`);
-            return;
-        }
-
-        // Disable form and show spinner
-        submitBtn.disabled = true;
-        spinner.style.display = 'inline-block';
-        buttonText.textContent = `検索中... (0/${isbnList.length})`;
-        resultsContainer.innerHTML = '<p>各サイトの結果を待っています...</p>';
-        const checkLocalInventory = checkLocalInventoryCheckbox.checked;
-
-        try {
-            let completedCount = 0;
-            const allResults = [];
-
-            for (const isbn of isbnList) {
-                console.log(`Simulating search for ISBN: ${isbn}`);
-                
-                // Simulate a short delay for each ISBN search
-                await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 500));
-
-                const results = getSimulatedResults(isbn, checkLocalInventory);
-                allResults.push(results);
-                
-                completedCount++;
-                buttonText.textContent = `検索中... (${completedCount}/${isbnList.length})`;
-                
-                // Display results progressively
-                displayResults(allResults, isbnList.length);
-            }
-
-            resultsContainer.innerHTML += `<p><strong>一括検索がすべて完了しました。</strong></p>`;
-
-
-        } catch (error) {
-            console.error('Error during search process:', error);
-            resultsContainer.innerHTML = `<p class="status-ng">エラーが発生しました。詳細はコンソールを確認してください。</p>`;
-        } finally {
-            // Re-enable form
-            submitBtn.disabled = false;
-            spinner.style.display = 'none';
-            buttonText.textContent = '一括検索実行';
-        }
+    // --- EVENT LISTENERS ---
+    const historySearchInput = document.getElementById('history-search');
+    historySearchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredData = dummyHistory.filter(item => 
+            item.isbn.includes(searchTerm) || item.title.toLowerCase().includes(searchTerm)
+        );
+        renderHistoryTable(filteredData);
     });
 
-    // Updated function to generate simulated results from dummy data
-    function getSimulatedResults(isbn, checkLocal) {
-        const bookData = dummyBookData[isbn] || dummyBookData["9999999999999"];
-        const sites = [
-            { id: 'honto', name: 'honto', logo: 'https://placehold.jp/50x50.png?text=honto' },
-            { id: 'rakuten', name: 'Rakuten', logo: 'https://placehold.jp/50x50.png?text=Rakuten' },
-            { id: 'yodobashi', name: 'Yodobashi', logo: 'https://placehold.jp/50x50.png?text=Yodobashi' },
-            { id: '7net', name: '7net', logo: 'https://placehold.jp/50x50.png?text=7net' },
-            { id: 'kinokuniya', name: 'Kinokuniya', logo: 'https://placehold.jp/50x50.png?text=Kinokuniya' },
-        ];
+    document.getElementById('save-settings-btn').addEventListener('click', (e) => {
+        const btn = e.target;
+        btn.textContent = '保存中...';
+        btn.disabled = true;
+        setTimeout(() => {
+            btn.textContent = '設定を保存';
+            btn.disabled = false;
+            // Show a temporary success message
+            const feedback = document.createElement('span');
+            feedback.textContent = '保存しました！';
+            feedback.style.color = 'green';
+            feedback.style.marginLeft = '10px';
+            btn.parentNode.insertBefore(feedback, btn.nextSibling);
+            setTimeout(() => feedback.remove(), 2000);
+        }, 1000);
+    });
 
-        // Simulate local inventory check
-        if (checkLocal && isbn === localInventoryIsbn) {
-            return {
-                isbn: isbn,
-                title: bookData.title,
-                isLocal: true, // Flag for local inventory
-                details: [] // No need to scrape other sites
-            };
-        }
 
-        return {
-            isbn: isbn,
-            title: bookData.title,
-            isLocal: false,
-            details: sites.map(site => {
-                const siteResult = bookData.sites[site.id];
-                return {
-                    site: site.name,
-                    logo: site.logo,
-                    status: siteResult.success ? 'OK' : 'NG',
-                    message: siteResult.price ? `${siteResult.message} - ¥${siteResult.price}` : siteResult.message,
-                    url: `https://github.com/mememori8888/book_lancers/issues/${Math.floor(Math.random() * 1000) + 1}`
-                };
-            })
-        };
+    // --- FUNCTIONS ---
+
+    function updateSummaryCards(history, pending) {
+        const processingCount = history.length;
+        const pendingSiteCount = Object.values(pending).filter(p => p.current > 0 && p.current < p.target).length;
+        const pendingTotalValue = Object.values(pending).reduce((acc, p) => acc + p.current, 0);
+
+        document.getElementById('processing-count').textContent = processingCount;
+        document.getElementById('pending-site-count').textContent = pendingSiteCount;
+        document.getElementById('pending-total-value').textContent = `¥${pendingTotalValue.toLocaleString()}`;
     }
 
-    function displayResults(results, totalIsbns) {
-        if (resultsContainer.querySelector('h3') === null) {
-             resultsContainer.innerHTML = `<h3>検索結果 (${results.length}/${totalIsbns} 件)</h3>`;
-        } else {
-            resultsContainer.querySelector('h3').textContent = `検索結果 (${results.length}/${totalIsbns} 件)`;
+    function renderPendingOrders(pending) {
+        const container = document.getElementById('pending-orders-container');
+        container.innerHTML = '';
+        for (const site in pending) {
+            const order = pending[site];
+            const progress = Math.min((order.current / order.target) * 100, 100);
+            const remaining = Math.max(0, order.target - order.current);
+            
+            const card = document.createElement('div');
+            card.className = 'pending-order-card';
+            card.id = `pending-${site}`;
+            card.innerHTML = `
+                <h4>${site}</h4>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${progress}%;"></div>
+                </div>
+                <p class="pending-details">
+                    現在 ¥${order.current.toLocaleString()} / 目標 ¥${order.target.toLocaleString()}
+                </p>
+                <p class="pending-remaining">あと ¥${remaining.toLocaleString()} で自動発注</p>
+                <button class="manual-order-btn" data-site="${site}">手動で発注</button>
+            `;
+            container.appendChild(card);
         }
 
-        results.forEach(resultGroup => {
-            // Avoid re-rendering existing cards
-            if (document.getElementById(`result-isbn-${resultGroup.isbn}`)) {
-                return;
-            }
+        // Add event listeners for manual order buttons
+        document.querySelectorAll('.manual-order-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const button = e.target;
+                const site = button.dataset.site;
+                const card = document.getElementById(`pending-${site}`);
+                
+                button.textContent = '処理中...';
+                button.disabled = true;
 
-            const card = document.createElement('div');
-            card.className = 'result-card-group';
-            card.id = `result-isbn-${resultGroup.isbn}`;
-
-            let detailsHtml;
-            let overallStatus;
-
-            if (resultGroup.isLocal) {
-                detailsHtml = `<div class="result-detail-item local-inventory-found">自家在庫にありました。ECサイトの検索をスキップしました。</div>`;
-                overallStatus = 'status-local';
-            } else {
-                overallStatus = resultGroup.details.some(r => r.status === 'OK') ? 'status-ok' : 'status-ng';
-                detailsHtml = resultGroup.details.map(detail => `
-                    <div class="result-detail-item">
-                        <img src="${detail.logo}" alt="${detail.site} dummy logo" class="site-logo-small">
-                        <span class="site-name-small">${detail.site}:</span>
-                        <span class="status-small ${detail.status === 'OK' ? 'status-ok' : 'status-ng'}">${detail.message}</span>
-                    </div>
-                `).join('');
-            }
-            
-            const statusText = {
-                'status-ok': '在庫あり',
-                'status-ng': '在庫なし/エラー',
-                'status-local': '自家在庫'
-            };
-
-            card.innerHTML = `
-                <div class="result-summary">
-                    <div>
-                        <span class="isbn-title">ISBN: ${resultGroup.isbn}</span>
-                        <span class="book-title">${resultGroup.title}</span>
-                    </div>
-                    <span class="status-badge ${overallStatus}">${statusText[overallStatus]}</span>
-                </div>
-                <div class="result-details">
-                    ${detailsHtml}
-                </div>
-            `;
-            resultsContainer.appendChild(card);
+                setTimeout(() => {
+                    card.innerHTML = `<p style="text-align: center; padding: 1rem;">発注処理が完了しました。</p>`;
+                    setTimeout(() => card.remove(), 1500);
+                }, 1000);
+            });
         });
     }
-});
 
+    function renderAdvancedSettings(settings) {
+        const tbody = document.getElementById('advanced-settings-table').querySelector('tbody');
+        tbody.innerHTML = '';
+        for (const site in settings) {
+            const setting = settings[site];
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${site}</td>
+                <td><input type="number" class="setting-input" value="${setting.minOrder}"></td>
+                <td><input type="text" class="setting-input" value="${setting.keywords}"></td>
+                <td><input type="number" class="setting-input" value="1"></td>
+            `;
+            tbody.appendChild(row);
+        }
+    }
+
+    function renderHistoryTable(data) {
+        const tbody = document.getElementById('history-table').querySelector('tbody');
+        tbody.innerHTML = '';
+
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5">データがありません。</td></tr>';
+            return;
+        }
+
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            
+            let overallStatus;
+            if (item.results.some(r => r.status === 'LOCAL')) {
+                overallStatus = '<span class="status-badge status-local">自家在庫</span>';
+            } else if (item.results.some(r => r.status === 'OK')) {
+                overallStatus = '<span class="status-badge status-ok">在庫あり</span>';
+            } else {
+                overallStatus = '<span class="status-badge status-ng">在庫なし/エラー</span>';
+            }
+
+            row.innerHTML = `
+                <td>${item.timestamp}</td>
+                <td>${item.isbn}</td>
+                <td>${item.title}</td>
+                <td>${overallStatus}</td>
+                <td>
+                    <button class="action-btn view-details-btn" data-isbn="${item.isbn}" data-timestamp="${item.timestamp}">詳細</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        // Add event listeners for the new "Details" buttons
+        document.querySelectorAll('.view-details-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const isbn = e.target.dataset.isbn;
+                const timestamp = e.target.dataset.timestamp;
+                const dataItem = dummyHistory.find(d => d.isbn === isbn && d.timestamp === timestamp);
+                if (dataItem) {
+                    openDetailsModal(dataItem);
+                }
+            });
+        });
+    }
+
+    function setupModal() {
+        const modal = document.getElementById('details-modal');
+        const closeBtn = document.querySelector('.modal-close');
+        closeBtn.onclick = () => modal.style.display = "none";
+        window.onclick = (event) => {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    }
+
+    function openDetailsModal(dataItem) {
+        const modal = document.getElementById('details-modal');
+        const modalContent = document.querySelector('.modal-content-body');
+
+        let resultsHtml;
+        if (dataItem.results.some(r => r.status === 'LOCAL')) {
+            resultsHtml = `<div class="modal-result-item local-found">${dataItem.results[0].message}</div>`;
+        } else {
+            resultsHtml = dataItem.results.map(result => `
+                <div class="modal-result-item">
+                    <span class="modal-site-name">${result.site}</span>
+                    <span class="modal-status ${result.status === 'OK' ? 'status-ok' : 'status-ng'}">
+                        ${result.message}
+                        ${result.price ? ` - ¥${result.price.toLocaleString()}` : ''}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        modalContent.innerHTML = `
+            <div class="modal-header">
+                <img src="${dataItem.image}" alt="${dataItem.title}" class="modal-book-image">
+                <div class="modal-book-info">
+                    <h3>${dataItem.title}</h3>
+                    <p><strong>ISBN:</strong> ${dataItem.isbn}</p>
+                    <p><strong>検索日時:</strong> ${dataItem.timestamp}</p>
+                </div>
+            </div>
+            <div class="modal-results">
+                <h4>検索結果</h4>
+                ${resultsHtml}
+            </div>
+        `;
+        modal.style.display = 'block';
+    }
+});
