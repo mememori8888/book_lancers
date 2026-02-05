@@ -10,7 +10,7 @@ body:
       description: "The title of the book being ordered."
       placeholder: "e.g., The Hitchhiker's Guide to the Galaxy"
     validations:
-      required: true
+      required: false
   - type: input
     id: product_code
     attributes:
@@ -26,7 +26,7 @@ body:
       description: "The price of the book as listed in the order email."
       placeholder: "e.g., 4186"
     validations:
-      required: true
+      required: false
   - type: input
     id: customer_email
     attributes:
@@ -34,7 +34,7 @@ body:
       description: "The email address of the customer who placed the order."
       placeholder: "e.g., customer@example.com"
     validations:
-      required: true
+      required: false
   - type: dropdown
     id: source_store
     attributes:
@@ -45,4 +45,4 @@ body:
         - "Rakuten"
         - "Other"
     validations:
-      required: true
+      required: false

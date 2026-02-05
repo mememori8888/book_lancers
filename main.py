@@ -55,12 +55,17 @@ def main():
         chrome_options.add_argument("window-size=1920x1080")
 
 
-    # Use webdriver-manager to handle driver
+    # Selenium 4.6.0以降、SeleniumManagerが同梱されたため、
+    # webdriver-managerは不要になり、よりシンプルな記述でWebDriverを初期化できます。
     try:
-        service = ChromeService(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver = webdriver.Chrome(options=chrome_options)
     except Exception as e:
         print(f"Failed to initialize WebDriver: {e}")
+        # GitHub Actions環境では、追加のデバッグ情報が役立つ場合があります。
+        print("Attempting to locate chromedriver...")
+        import shutil
+        chromedriver_path = shutil.which("chromedriver")
+        print(f"Chromedriver path: {chromedriver_path}")
         return
 
 
