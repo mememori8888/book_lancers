@@ -7,6 +7,73 @@ document.addEventListener('DOMContentLoaded', () => {
     const buttonText = document.querySelector('.button-text');
     const resultsContainer = document.getElementById('results-container');
     const isbnTextarea = document.getElementById('isbn-list');
+    const checkLocalInventoryCheckbox = document.getElementById('check-local-inventory');
+
+    // --- Start of Realistic Dummy Data ---
+    const dummyBookData = {
+        "9784297137819": {
+            title: "スッキリわかるSQL入門 第3版",
+            author: "中山 清喬, 飯田 理恵",
+            publisher: "翔泳社",
+            sites: {
+                honto: { success: true, message: "在庫あり", price: 3080 },
+                rakuten: { success: true, message: "在庫あり", price: 3080 },
+                yodobashi: { success: true, message: "在庫あり", price: 3080 },
+                '7net': { success: true, message: "お取り寄せ(1～3日)", price: 3080 },
+                kinokuniya: { success: false, message: "在庫僅少", price: null },
+            }
+        },
+        "9784297128138": {
+            title: "徹底攻略 情報処理安全確保支援士教科書 令和5年度",
+            author: "瀬戸 美月",
+            publisher: "インプレス",
+            sites: {
+                honto: { success: true, message: "在庫あり", price: 3520 },
+                rakuten: { success: false, message: "メーカー取り寄せ", price: null },
+                yodobashi: { success: true, message: "在庫あり", price: 3520 },
+                '7net': { success: false, message: "在庫なし", price: null },
+                kinokuniya: { success: true, message: "店舗在庫あり", price: 3520 },
+            }
+        },
+        "9784839979359": {
+            title: "Web API: The Good Parts",
+            author: "水野 貴明",
+            publisher: "マイナビ出版",
+            sites: {
+                honto: { success: true, message: "在庫あり", price: 2640 },
+                rakuten: { success: true, message: "在庫あり", price: 2640 },
+                yodobashi: { success: false, message: "販売終了", price: null },
+                '7net': { success: true, message: "在庫あり", price: 2640 },
+                kinokuniya: { success: false, message: "出版社在庫切れ", price: null },
+            }
+        },
+        "9784774193248": { // This ISBN will be used for the "local inventory" demo
+            title: "パーフェクトPHP (PERFECT SERIES)",
+            author: "小川 雄大",
+            publisher: "技術評論社",
+            sites: {
+                honto: { success: true, message: "在庫あり", price: 3520 },
+                rakuten: { success: true, message: "在庫あり", price: 3520 },
+                yodobashi: { success: true, message: "在庫あり", price: 3520 },
+                '7net': { success: true, message: "お取り寄せ(1～3日)", price: 3520 },
+                kinokuniya: { success: true, message: "店舗在庫あり", price: 3520 },
+            }
+        },
+        "9999999999999": { // Dummy for "not found" cases
+            title: "存在しない書籍",
+            author: "不明",
+            publisher: "不明",
+            sites: {
+                honto: { success: false, message: "商品が見つかりません", price: null },
+                rakuten: { success: false, message: "商品が見つかりません", price: null },
+                yodobashi: { success: false, message: "商品が見つかりません", price: null },
+                '7net': { success: false, message: "商品が見つかりません", price: null },
+                kinokuniya: { success: false, message: "商品が見つかりません", price: null },
+            }
+        }
+    };
+    const localInventoryIsbn = "9784774193248";
+    // --- End of Realistic Dummy Data ---
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -29,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         spinner.style.display = 'inline-block';
         buttonText.textContent = `検索中... (0/${isbnList.length})`;
         resultsContainer.innerHTML = '<p>各サイトの結果を待っています...</p>';
+        const checkLocalInventory = checkLocalInventoryCheckbox.checked;
 
         try {
             let completedCount = 0;
@@ -37,12 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
             for (const isbn of isbnList) {
                 console.log(`Simulating search for ISBN: ${isbn}`);
                 
-                const issueUrl = await createNewIssue(isbn);
-                
-                await new Promise(resolve => setTimeout(resolve, 1500)); // Shorter wait for batch simulation
+                // Simulate a short delay for each ISBN search
+                await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 500));
 
-                const results = getSimulatedResults(isbn, issueUrl);
-                allResults.push(...results);
+                const results = getSimulatedResults(isbn, checkLocalInventory);
+                allResults.push(results);
                 
                 completedCount++;
                 buttonText.textContent = `検索中... (${completedCount}/${isbnList.length})`;
@@ -65,42 +132,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Placeholder function to simulate creating a GitHub issue
-    async function createNewIssue(isbn) {
-        // In a real implementation, this would use the GitHub API
-        // For now, we just log it and return a fake URL
-        console.log('Simulating GitHub Issue creation for', isbn);
-        const issueNumber = Math.floor(Math.random() * 1000) + 1;
-        const fakeIssueUrl = `https://github.com/mememori8888/book_lancers/issues/${issueNumber}`;
-        
-        // Don't flood the UI with issue creation messages in batch mode
-        return fakeIssueUrl;
-    }
-
-    // Placeholder function to generate simulated results
-    function getSimulatedResults(isbn, issueUrl) {
+    // Updated function to generate simulated results from dummy data
+    function getSimulatedResults(isbn, checkLocal) {
+        const bookData = dummyBookData[isbn] || dummyBookData["9999999999999"];
         const sites = [
-            { name: 'honto', logo: 'https://placehold.jp/50x50.png?text=honto' },
-            { name: 'rakuten', logo: 'https://placehold.jp/50x50.png?text=Rakuten' },
-            { name: 'yodobashi', logo: 'https://placehold.jp/50x50.png?text=Yodobashi' },
-            { name: '7net', logo: 'https://placehold.jp/50x50.png?text=7net' },
-            { name: 'kinokuniya', logo: 'https://placehold.jp/50x50.png?text=Kinokuniya' },
+            { id: 'honto', name: 'honto', logo: 'https://placehold.jp/50x50.png?text=honto' },
+            { id: 'rakuten', name: 'Rakuten', logo: 'https://placehold.jp/50x50.png?text=Rakuten' },
+            { id: 'yodobashi', name: 'Yodobashi', logo: 'https://placehold.jp/50x50.png?text=Yodobashi' },
+            { id: '7net', name: '7net', logo: 'https://placehold.jp/50x50.png?text=7net' },
+            { id: 'kinokuniya', name: 'Kinokuniya', logo: 'https://placehold.jp/50x50.png?text=Kinokuniya' },
         ];
 
-        // Group results by ISBN
-        return [{
+        // Simulate local inventory check
+        if (checkLocal && isbn === localInventoryIsbn) {
+            return {
+                isbn: isbn,
+                title: bookData.title,
+                isLocal: true, // Flag for local inventory
+                details: [] // No need to scrape other sites
+            };
+        }
+
+        return {
             isbn: isbn,
+            title: bookData.title,
+            isLocal: false,
             details: sites.map(site => {
-                const success = Math.random() > 0.3; // 70% chance of success
+                const siteResult = bookData.sites[site.id];
                 return {
                     site: site.name,
                     logo: site.logo,
-                    status: success ? 'OK' : 'NG',
-                    message: success ? `在庫あり - ¥${Math.floor(Math.random() * 2000) + 1000}` : '商品が見つかりません',
-                    url: issueUrl // Link back to the issue for details
+                    status: siteResult.success ? 'OK' : 'NG',
+                    message: siteResult.price ? `${siteResult.message} - ¥${siteResult.price}` : siteResult.message,
+                    url: `https://github.com/mememori8888/book_lancers/issues/${Math.floor(Math.random() * 1000) + 1}`
                 };
             })
-        }];
+        };
     }
 
     function displayResults(results, totalIsbns) {
@@ -109,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             resultsContainer.querySelector('h3').textContent = `検索結果 (${results.length}/${totalIsbns} 件)`;
         }
-
 
         results.forEach(resultGroup => {
             // Avoid re-rendering existing cards
@@ -121,20 +187,36 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'result-card-group';
             card.id = `result-isbn-${resultGroup.isbn}`;
 
-            const overallStatus = resultGroup.details.some(r => r.status === 'OK') ? 'status-ok' : 'status-ng';
+            let detailsHtml;
+            let overallStatus;
 
-            let detailsHtml = resultGroup.details.map(detail => `
-                <div class="result-detail-item">
-                    <img src="${detail.logo}" alt="${detail.site} dummy logo" class="site-logo-small">
-                    <span class="site-name-small">${detail.site}:</span>
-                    <span class="status-small ${detail.status === 'OK' ? 'status-ok' : 'status-ng'}">${detail.message}</span>
-                </div>
-            `).join('');
+            if (resultGroup.isLocal) {
+                detailsHtml = `<div class="result-detail-item local-inventory-found">自家在庫にありました。ECサイトの検索をスキップしました。</div>`;
+                overallStatus = 'status-local';
+            } else {
+                overallStatus = resultGroup.details.some(r => r.status === 'OK') ? 'status-ok' : 'status-ng';
+                detailsHtml = resultGroup.details.map(detail => `
+                    <div class="result-detail-item">
+                        <img src="${detail.logo}" alt="${detail.site} dummy logo" class="site-logo-small">
+                        <span class="site-name-small">${detail.site}:</span>
+                        <span class="status-small ${detail.status === 'OK' ? 'status-ok' : 'status-ng'}">${detail.message}</span>
+                    </div>
+                `).join('');
+            }
+            
+            const statusText = {
+                'status-ok': '在庫あり',
+                'status-ng': '在庫なし/エラー',
+                'status-local': '自家在庫'
+            };
 
             card.innerHTML = `
                 <div class="result-summary">
-                    <span class="isbn-title">ISBN: ${resultGroup.isbn}</span>
-                    <span class="status-badge ${overallStatus}">${overallStatus === 'status-ok' ? '在庫あり' : '在庫なし/エラー'}</span>
+                    <div>
+                        <span class="isbn-title">ISBN: ${resultGroup.isbn}</span>
+                        <span class="book-title">${resultGroup.title}</span>
+                    </div>
+                    <span class="status-badge ${overallStatus}">${statusText[overallStatus]}</span>
                 </div>
                 <div class="result-details">
                     ${detailsHtml}

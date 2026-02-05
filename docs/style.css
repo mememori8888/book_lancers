@@ -191,6 +191,23 @@ main {
 .status-ok { background-color: #28a745; }
 .status-ng { background-color: #dc3545; }
 .status-partial { background-color: #ffc107; color: #333; }
+.status-local { background-color: #17a2b8; }
+
+.local-inventory-found {
+    color: #0e616e;
+    font-weight: bold;
+    padding: 1rem;
+    background-color: #d1ecf1;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.book-title {
+    display: block;
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 4px;
+}
 
 .action-btn {
     background: none;
@@ -207,7 +224,7 @@ main {
     color: white;
 }
 
-/* Modal Styles */
+/* --- Modal Styles --- */
 .modal {
     display: none; 
     position: fixed; 
@@ -322,7 +339,7 @@ main {
 }
 
 
-/* Search Page Specific Styles */
+/* --- Search Page Specific Styles (index.html) --- */
 .search-form, .results-area {
     background-color: var(--card-bg);
     padding: 2rem;
