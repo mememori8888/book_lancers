@@ -1,6 +1,6 @@
 import argparse
 import re
-from selenium import webdriver
+from seleniumwire import webdriver
 from selenium.webdriver.chrome.options import Options
 
 # Import all scrapers

@@ -1,4 +1,4 @@
-selenium
+selenium-wire
 beautifulsoup4
 pandas
 lxml
