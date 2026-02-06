@@ -9,7 +9,10 @@
 <body>
     <header>
         <h1>書籍自動発注システム</h1>
-        <p>ISBNコードを入力して、各ECサイトの価格と在庫を一度に検索します。</p>
+        <nav>
+            <a href="search.html" class="active">書籍検索</a>
+            <a href="index.html">コントロールパネル</a>
+        </nav>
     </header>
 
     <main>
@@ -20,9 +23,15 @@
                     <div class="form-group">
                         <label for="isbn-list">ISBNコード (改行で複数入力可)</label>
                         <textarea id="isbn-list" name="isbn-list" rows="5" placeholder="例:
-9784003220818
-9784101010016
-9784798157578"></textarea>
+9784297137819
+9784297128138
+9784839979359
+9784774193248
+9999999999999"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" id="check-local-inventory" name="check-local-inventory">
+                        <label for="check-local-inventory">自家在庫を優先的に確認する</label>
                     </div>
                     <button type="submit" id="submit-btn">
                         <span class="button-text">一括検索実行</span>
@@ -34,7 +43,7 @@
             <div class="results-area">
                 <h2><span class="icon">📊</span> 検索結果</h2>
                 <div id="results-container">
-                    <p class="no-results">まだ検索は実行されていません。</p>
+                    <p class="no-results">検索ボタンを押して、デモを開始してください。</p>
                 </div>
             </div>
         </div>
@@ -44,6 +53,6 @@
         <p>&copy; 2026 Book Lancers. All rights reserved.</p>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="search.js"></script>
 </body>
 </html>

@@ -1,10 +1,10 @@
-// script.js
+// search.js (for search page - search.html)
 
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('order-form');
     const submitBtn = document.getElementById('submit-btn');
-    const spinner = document.querySelector('.spinner');
-    const buttonText = document.querySelector('.button-text');
+    const spinner = submitBtn.querySelector('.spinner');
+    const buttonText = submitBtn.querySelector('.button-text');
     const resultsContainer = document.getElementById('results-container');
     const isbnTextarea = document.getElementById('isbn-list');
     const checkLocalInventoryCheckbox = document.getElementById('check-local-inventory');
@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "スッキリわかるSQL入門 第3版",
             author: "中山 清喬, 飯田 理恵",
             publisher: "翔泳社",
+            image: "https://placehold.jp/150x220.png?text=SQL入門",
             sites: {
                 honto: { success: true, message: "在庫あり", price: 3080 },
                 rakuten: { success: true, message: "在庫あり", price: 3080 },
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "徹底攻略 情報処理安全確保支援士教科書 令和5年度",
             author: "瀬戸 美月",
             publisher: "インプレス",
+            image: "https://placehold.jp/150x220.png?text=支援士教科書",
             sites: {
                 honto: { success: true, message: "在庫あり", price: 3520 },
                 rakuten: { success: false, message: "メーカー取り寄せ", price: null },
@@ -39,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "Web API: The Good Parts",
             author: "水野 貴明",
             publisher: "マイナビ出版",
+            image: "https://placehold.jp/150x220.png?text=Web+API",
             sites: {
                 honto: { success: true, message: "在庫あり", price: 2640 },
                 rakuten: { success: true, message: "在庫あり", price: 2640 },
@@ -51,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "パーフェクトPHP (PERFECT SERIES)",
             author: "小川 雄大",
             publisher: "技術評論社",
+            image: "https://placehold.jp/150x220.png?text=PHP",
             sites: {
                 honto: { success: true, message: "在庫あり", price: 3520 },
                 rakuten: { success: true, message: "在庫あり", price: 3520 },
@@ -63,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "存在しない書籍",
             author: "不明",
             publisher: "不明",
+            image: "https://placehold.jp/150x220.png?text=Not+Found",
             sites: {
                 honto: { success: false, message: "商品が見つかりません", price: null },
                 rakuten: { success: false, message: "商品が見つかりません", price: null },
@@ -75,17 +80,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const localInventoryIsbn = "9784774193248";
     // --- End of Realistic Dummy Data ---
 
+    // Initial demo state
+    if (resultsContainer) {
+        const initialIsbns = isbnTextarea.value.trim().split('\n').filter(isbn => isbn.trim() !== '');
+        if (initialIsbns.length > 0) {
+            runSearch(initialIsbns);
+        }
+    }
+
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-
         const isbnList = isbnTextarea.value.trim().split('\n').filter(isbn => isbn.trim() !== '');
-        
+        runSearch(isbnList);
+    });
+
+    async function runSearch(isbnList) {
         if (isbnList.length === 0) {
             alert('有効なISBNコードを1つ以上入力してください。');
             return;
         }
 
-        const invalidIsbns = isbnList.filter(isbn => !/^\d{13}$/.test(isbn.trim()));
+        const invalidIsbns = isbnList.filter(isbn => !/^(978|979)\d{10}$/.test(isbn.trim().replace(/-/g, '')));
         if (invalidIsbns.length > 0) {
             alert(`以下のISBNコードの形式が正しくありません (13桁の数字):\n${invalidIsbns.join('\n')}`);
             return;
@@ -95,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.disabled = true;
         spinner.style.display = 'inline-block';
         buttonText.textContent = `検索中... (0/${isbnList.length})`;
-        resultsContainer.innerHTML = '<p>各サイトの結果を待っています...</p>';
+        resultsContainer.innerHTML = '<p class="no-results">各サイトの結果を待っています...</p>';
         const checkLocalInventory = checkLocalInventoryCheckbox.checked;
 
         try {
@@ -106,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log(`Simulating search for ISBN: ${isbn}`);
                 
                 // Simulate a short delay for each ISBN search
-                await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 500));
+                await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 400));
 
                 const results = getSimulatedResults(isbn, checkLocalInventory);
                 allResults.push(results);
@@ -118,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 displayResults(allResults, isbnList.length);
             }
 
-            resultsContainer.innerHTML += `<p><strong>一括検索がすべて完了しました。</strong></p>`;
+            resultsContainer.innerHTML += `<p style="text-align:center; margin-top:1rem; color:#666;"><strong>一括検索がすべて完了しました。</strong></p>`;
 
 
         } catch (error) {
@@ -130,9 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
             spinner.style.display = 'none';
             buttonText.textContent = '一括検索実行';
         }
-    });
+    }
 
-    // Updated function to generate simulated results from dummy data
     function getSimulatedResults(isbn, checkLocal) {
         const bookData = dummyBookData[isbn] || dummyBookData["9999999999999"];
         const sites = [
@@ -143,19 +158,20 @@ document.addEventListener('DOMContentLoaded', () => {
             { id: 'kinokuniya', name: 'Kinokuniya', logo: 'https://placehold.jp/50x50.png?text=Kinokuniya' },
         ];
 
-        // Simulate local inventory check
         if (checkLocal && isbn === localInventoryIsbn) {
             return {
                 isbn: isbn,
                 title: bookData.title,
-                isLocal: true, // Flag for local inventory
-                details: [] // No need to scrape other sites
+                image: bookData.image,
+                isLocal: true,
+                details: []
             };
         }
 
         return {
             isbn: isbn,
             title: bookData.title,
+            image: bookData.image,
             isLocal: false,
             details: sites.map(site => {
                 const siteResult = bookData.sites[site.id];
@@ -163,8 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     site: site.name,
                     logo: site.logo,
                     status: siteResult.success ? 'OK' : 'NG',
-                    message: siteResult.price ? `${siteResult.message} - ¥${siteResult.price}` : siteResult.message,
-                    url: `https://github.com/mememori8888/book_lancers/issues/${Math.floor(Math.random() * 1000) + 1}`
+                    message: siteResult.price ? `${siteResult.message} - ¥${siteResult.price.toLocaleString()}` : siteResult.message,
+                    url: `javascript:void(0);` // Dummy link
                 };
             })
         };
@@ -178,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         results.forEach(resultGroup => {
-            // Avoid re-rendering existing cards
             if (document.getElementById(`result-isbn-${resultGroup.isbn}`)) {
                 return;
             }
@@ -213,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.innerHTML = `
                 <div class="result-summary">
                     <div>
-                        <span class="isbn-title">ISBN: ${resultGroup.isbn}</span>
+                        <span class="isbn-title">${resultGroup.isbn}</span>
                         <span class="book-title">${resultGroup.title}</span>
                     </div>
                     <span class="status-badge ${overallStatus}">${statusText[overallStatus]}</span>
@@ -223,7 +238,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             resultsContainer.appendChild(card);
+
+            // Add click listener to toggle details
+            const summary = card.querySelector('.result-summary');
+            const details = card.querySelector('.result-details');
+            summary.addEventListener('click', () => {
+                details.style.display = details.style.display === 'block' ? 'none' : 'block';
+            });
         });
     }
 });
-

@@ -1,4 +1,4 @@
-// dashboard.js
+// script.js (for dashboard - index.html)
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- REALISTIC DUMMY DATA ---
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: 'パーフェクトPHP', 
             image: 'https://placehold.jp/150x200.png?text=PHP',
             results: [ 
-                { site: 'honto', status: 'LOCAL', price: null, message: '自家在庫にありました' }
+                { site: 'honto', status: 'LOCAL', message: '自家在庫にありました' }
             ] 
         },
         { 

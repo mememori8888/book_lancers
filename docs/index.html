@@ -10,7 +10,7 @@
 <body>
     <header>
         <h1>書籍自動発注システム</h1>
-                <nav>
+        <nav>
             <a href="search.html">書籍検索</a>
             <a href="index.html" class="active">コントロールパネル</a>
         </nav>
@@ -20,45 +20,47 @@
         <div class="container">
             <div class="dashboard-grid">
                 <!-- Summary Cards -->
-                <div class="card summary-card" id="total-searches">
-                    <h3>総検索数</h3>
-                    <p class="summary-value">0</p>
+                <div class="card summary-card">
+                    <h3>処理中タスク</h3>
+                    <p id="processing-count" class="summary-value">0</p>
                 </div>
-                <div class="card summary-card" id="success-rate">
-                    <h3>成功率</h3>
-                    <p class="summary-value">0%</p>
+                <div class="card summary-card">
+                    <h3>保留中サイト</h3>
+                    <p id="pending-site-count" class="summary-value">0</p>
                 </div>
-                <div class="card summary-card" id="error-count">
-                    <h3>要確認エラー</h3>
-                    <p class="summary-value">0</p>
-                </div>
-
-                <!-- Site Status Chart -->
-                <div class="card chart-card">
-                    <h2><span class="icon">📈</span> サイト別 成功率</h2>
-                    <canvas id="siteStatusChart"></canvas>
+                <div class="card summary-card">
+                    <h3>保留合計金額</h3>
+                    <p id="pending-total-value" class="summary-value">¥0</p>
                 </div>
 
-                <!-- Search Settings -->
-                <div class="card settings-card">
-                    <h2><span class="icon">⚙️</span> 検索設定</h2>
-                    <p>検索対象にするECサイトを選択します。</p>
-                    <div id="site-settings" class="settings-grid">
-                        <!-- Checkboxes will be inserted by JS -->
+                <!-- Pending Orders -->
+                <div class="card pending-orders-card">
+                    <h2><span class="icon">⏳</span> 自動発注 保留中</h2>
+                    <div id="pending-orders-container">
+                        <!-- Pending orders will be inserted by JS -->
                     </div>
                 </div>
 
-                <!-- Notification Settings -->
-                <div class="card settings-card">
-                    <h2><span class="icon">🔔</span> 通知設定</h2>
-                    <p>検索完了時に通知を受け取ります。</p>
-                    <div class="setting-item">
-                        <input type="checkbox" id="email-notification" name="email-notification">
-                        <label for="email-notification">メール通知を有効にする</label>
+                <!-- Advanced Settings -->
+                <div class="card advanced-settings-card">
+                    <h2><span class="icon">⚙️</span> 自動発注 詳細設定</h2>
+                    <div class="table-wrapper">
+                        <table id="advanced-settings-table">
+                            <thead>
+                                <tr>
+                                    <th>サイト</th>
+                                    <th>最低発注金額 (円)</th>
+                                    <th>在庫判断キーワード</th>
+                                    <th>発注上限 (冊)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Settings rows will be inserted by JS -->
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label for="email-address">通知先メールアドレス</label>
-                        <input type="email" id="email-address" placeholder="user@example.com">
+                    <div class="settings-actions">
+                        <button id="save-settings-btn">設定を保存</button>
                     </div>
                 </div>
 
@@ -92,8 +94,8 @@
         <!-- Modal for search result details -->
         <div id="details-modal" class="modal">
             <div class="modal-content">
-                <span class="close-btn">&times;</span>
-                <div id="modal-body">
+                <span class="modal-close">&times;</span>
+                <div class="modal-content-body">
                     <!-- Details will be inserted by JS -->
                 </div>
             </div>
